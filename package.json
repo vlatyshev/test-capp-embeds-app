@@ -8,6 +8,11 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "browserslist": [
+    "> 1%",
+    "ios >= 8",
+    "ie >= 10"
+  ],
   "dependencies": {
     "next": "11.1.2",
     "react": "17.0.2",
@@ -15,7 +20,7 @@
   },
   "devDependencies": {
     "@types/react": "17.0.31",
-    "eslint": "8.0.1",
+    "eslint": "<8.0.0",
     "eslint-config-next": "11.1.2",
     "typescript": "4.4.4"
   }
