@@ -19,15 +19,16 @@ const Home: NextPage<HomePageProps> = ({ modelIDs, error }) => {
     const router = useRouter();
     const { owner, limit } = router.query;
 
-    const handleSubmitSearch = useCallback((e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmitSearch = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const formValues = formValuesToObject(e.target as HTMLFormElement);
 
-        router.push({
+        await router.push({
             pathname: '/',
             query: formValues,
-        });
+        }, undefined, { shallow: true });
+        router.reload();
     }, [router]);
 
     return (
