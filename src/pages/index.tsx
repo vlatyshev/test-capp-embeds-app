@@ -2,6 +2,7 @@ import Head from 'next/head';
 import React, { useCallback } from 'react';
 import { useRouter } from 'next/router';
 
+import { getModelsFromApi } from 'lib/get_models';
 import { API_FILES_LIST } from 'constants/urls';
 import { Capp3DPlayer } from 'components/Capp3DPlayer';
 import { formValuesToObject } from 'utils/parseFormData';
@@ -66,6 +67,7 @@ const Home: NextPage<HomePageProps> = ({ modelIDs, error }) => {
                     </button>
                 </form>
                 {error && <div className={styles.error}>{error}</div>}
+                {modelIDs.length > 0 && <div>Loaded: {modelIDs.length}</div>}
 
                 <div className={styles.grid}>
                     {modelIDs.map((modelID) => (
@@ -91,24 +93,11 @@ export const getServerSideProps: GetServerSideProps<HomePageProps> = async (ctx)
         };
     }
     try {
-        const params = new URLSearchParams({
-            owner: String(owner),
-            limit: String(limit ?? '50'),
-            sortBy: 'uploadedAt',
-            order: 'DESC',
-            shallow: '1',
-        });
-        const authorization = process.env.API_BEARER_TOKEN ? `Bearer ${process.env.API_BEARER_TOKEN}` : '';
+        const resps = await getModelsFromApi(owner as string, Number(limit));
+        const findErrors = resps.find((resp) => (resp.status !== undefined && resp.status !== 200) || resp.errors !== undefined);
 
-        const res = await fetch(`${API_FILES_LIST}?${params}`, {
-            headers: {
-                authorization,
-            },
-        });
-        const responseData = await res.json();
-
-        if (res.status !== 200 || responseData.errors !== undefined) {
-            const error = responseData.errors.find((error: any) => error.title).title;
+        if (findErrors) {
+            const error = findErrors.errors.find((error: any) => error.title).title;
             return {
                 props: {
                     error,
@@ -117,7 +106,8 @@ export const getServerSideProps: GetServerSideProps<HomePageProps> = async (ctx)
                 },
             };
         }
-        const modelIDs = responseData.data.map((fileData: any) => fileData.id);
+
+        const modelIDs = resps.map((resp) => resp.data.map((fileData: any) => fileData.id)).flat();
 
         return {
             props: {
