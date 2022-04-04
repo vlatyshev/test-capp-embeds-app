@@ -1,35 +1,41 @@
 import Head from 'next/head';
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { useRouter } from 'next/router';
 
 import { getModelsFromApi } from 'lib/get_models';
-import { API_FILES_LIST } from 'constants/urls';
+import { ApiTypeSelect } from 'components/ApiTypeSelect';
 import { Capp3DPlayer } from 'components/Capp3DPlayer';
 import { formValuesToObject } from 'utils/parseFormData';
 
 import styles from '../styles/Home.module.css';
 
 import type { GetServerSideProps, NextPage } from 'next';
+import type { ApiTypeKeys } from 'constants/urls';
 
 type HomePageProps = {
     modelIDs: string[];
     error?: null | string;
 };
 
+type HomePageQuery = {
+    owner?: string;
+    limit?: string;
+    apiType?: ApiTypeKeys;
+};
+
 const Home: NextPage<HomePageProps> = ({ modelIDs, error }) => {
     const router = useRouter();
-    const { owner, limit } = router.query;
+    const { owner = '', limit = 50 } = router.query as HomePageQuery;
 
-    const handleSubmitSearch = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmitSearch = useCallback((e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const formValues = formValuesToObject(e.target as HTMLFormElement);
 
-        await router.push({
+        router.push({
             pathname: '/',
             query: formValues,
-        }, undefined, { shallow: true });
-        router.reload();
+        });
     }, [router]);
 
     return (
@@ -45,19 +51,25 @@ const Home: NextPage<HomePageProps> = ({ modelIDs, error }) => {
                     App for testing <a href="https://3d.cappasity.com">Cappasity</a> embeds
                 </h1>
 
-                <form className={styles.search} onSubmit={handleSubmitSearch}>
+                <ApiTypeSelect name="apiType" id="apiType" form="model-list" />
+
+                <form
+                    id="model-list"
+                    className={styles.search}
+                    onSubmit={handleSubmitSearch}
+                >
                     <input
                         name="owner"
                         type="text"
                         className={styles.searchTerm}
-                        defaultValue={owner ?? ''}
+                        defaultValue={owner}
                         placeholder="Search files of username"
                     />
                     <input
                         name="limit"
                         type="number"
                         className={`${styles.searchTerm} ${styles.number}`}
-                        defaultValue={limit ?? 50}
+                        defaultValue={limit}
                         placeholder="limit"
                     />
                     <button type="submit" className={styles.searchButton}>
@@ -82,7 +94,7 @@ const Home: NextPage<HomePageProps> = ({ modelIDs, error }) => {
 };
 
 export const getServerSideProps: GetServerSideProps<HomePageProps> = async (ctx) => {
-    const { owner, limit } = ctx.query;
+    const { owner, limit = 50, apiType = 'production' } = ctx.query as HomePageQuery;
 
     if (!owner) {
         return {
@@ -93,7 +105,7 @@ export const getServerSideProps: GetServerSideProps<HomePageProps> = async (ctx)
         };
     }
     try {
-        const resps = await getModelsFromApi(owner as string, Number(limit));
+        const resps = await getModelsFromApi(apiType, owner as string, Number(limit));
         const findErrors = resps.find((resp) => (resp.status !== undefined && resp.status !== 200) || resp.errors !== undefined);
 
         if (findErrors) {

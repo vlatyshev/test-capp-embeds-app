@@ -40,7 +40,7 @@
   position: relative;
   display: flex;
   justify-content: center;
-  margin-top: 50px;
+  margin-top: 15px;
   margin-bottom: 15px;
 }
 
@@ -112,5 +112,4 @@
   border: 1px solid #eaeaea;
   border-radius: 10px;
   transition: color 0.15s ease, border-color 0.15s ease;
-  width: 45%;
 }

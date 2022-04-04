@@ -1,0 +1,21 @@
+.selectContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+    margin-bottom: 15px;
+}
+
+.select {
+    background-color: #0aadff;
+    color: white;
+    width: 140px;
+    height: 36px;
+    border: 2px solid #0aadff;
+    border-radius: 5px;
+    margin-left: 15px;
+}
+
+.select:focus {
+    border: 2px solid #1e90ff;
+}

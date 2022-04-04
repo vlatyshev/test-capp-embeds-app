@@ -1,8 +1,10 @@
-import { API_FILES_LIST } from 'constants/urls';
+import { API_FILES_LIST, API_URLS } from 'constants/urls';
+
+import type { ApiTypeKeys } from 'constants/urls';
 
 const API_LIMIT_GET_MODELS_COUNT = 100;
 
-const getModels = async (owner: string, limit: number, offset: number) => {
+const getModels = async (apiType: ApiTypeKeys, owner: string, limit: number, offset: number) => {
     const params = new URLSearchParams({
         offset: String(offset),
         owner: String(owner),
@@ -12,18 +14,12 @@ const getModels = async (owner: string, limit: number, offset: number) => {
         shallow: '1',
     });
 
-    const authorization = process.env.API_BEARER_TOKEN ? `Bearer ${process.env.API_BEARER_TOKEN}` : '';
-
-    const res = await fetch(`${API_FILES_LIST}?${params}`, {
-        headers: {
-            authorization,
-        },
-    });
+    const res = await fetch(`${API_FILES_LIST(apiType)}?${params}`);
 
     return await res.json();
 };
 
-export const getModelsFromApi = async (owner: string, limit: number) => {
+export const getModelsFromApi = async (apiType: ApiTypeKeys, owner: string, limit: number) => {
     const maxCount = API_LIMIT_GET_MODELS_COUNT;
     const maxRound = Math.ceil(limit / maxCount);
     const minRound = Math.floor(limit / maxCount);
@@ -32,7 +28,7 @@ export const getModelsFromApi = async (owner: string, limit: number) => {
         .map((_, index) => index < minRound ? maxCount : limit % maxCount);
 
     const reqs = countRequests.map(async (limit, index) => (
-        getModels(owner, limit, index === 0 ? 0 : index + API_LIMIT_GET_MODELS_COUNT))
+        getModels(apiType, owner, limit, index === 0 ? 0 : index + API_LIMIT_GET_MODELS_COUNT))
     );
 
     return Promise.all(reqs);
