@@ -1,0 +1,23 @@
+.socialsContainer {
+    position: fixed;
+    right: 30px;
+    top: 30px;
+    display: flex;
+}
+
+.socialCard {
+    color: #696969;
+}
+
+.socialCard:hover {
+    color: black;
+}
+
+.socialCard:not(:last-child) {
+    margin-right: 15px;
+}
+
+.socialIcon {
+    width: 48px;
+    height: 48px;
+}
