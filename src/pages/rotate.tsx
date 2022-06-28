@@ -27,15 +27,19 @@ const Rotate: NextPage<RotatePageProps> = ({ modelIDs }) => {
     const apiTypeQuery = useApiTypeQuery();
     const iframes = useRef<(HTMLIFrameElement | null)[]>([]);
 
-    const handleSlider = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        const { value } = event.target;
-
+    const handleSlide = useCallback((value: number) => {
         iframes.current.forEach((iframe) => {
             if (!iframe || !iframe.contentWindow) {
                 return;
             }
             iframe.contentWindow.postMessage({ fn: 'rotateToDeg', args: [value] }, getApiUrl(apiTypeQuery));
         });
+    }, []);
+
+    const handleSliderChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+        const { value } = event.target;
+
+        handleSlide(parseInt(value));
     }, []);
 
     const handleIframeRef = useCallback((index: number) => (ref: HTMLIFrameElement | null) => {
@@ -50,8 +54,8 @@ const Rotate: NextPage<RotatePageProps> = ({ modelIDs }) => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 
-            <main className={stylesHome.main}>
-                <div className={stylesHome.grid}>
+            <main className={clsx(stylesHome.main, styles.main)}>
+                <div className={clsx(stylesHome.grid, styles.grid)}>
                     {modelIDs.map((modelID, index) => (
                         <Capp3DPlayer
                             // eslint-disable-next-line react/no-array-index-key
@@ -70,7 +74,7 @@ const Rotate: NextPage<RotatePageProps> = ({ modelIDs }) => {
                     step="1"
                     defaultValue={0}
                     className={clsx(styles.rangeSlider, styles.rotateSlider)}
-                    onChange={handleSlider}
+                    onChange={handleSliderChange}
                 />
             </main>
         </div>
