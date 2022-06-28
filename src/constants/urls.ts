@@ -1,11 +1,11 @@
-export enum API_URLS {
+export enum APIUrls {
     production = 'https://api.cappasity.com/api/',
     staging = 'https://api.cappasity3d.com/api/',
-};
+}
 
-export type ApiTypeKeys = keyof typeof API_URLS;
+export type ApiTypeKeys = keyof typeof APIUrls;
 
-export const getApiUrl = (apiType: ApiTypeKeys): string => API_URLS[apiType] ?? API_URLS.production;
+export const getApiUrl = (apiType: ApiTypeKeys): string => APIUrls[apiType] ?? APIUrls.production;
 
 // Player
 export const API_PLAYER_URL = (apiType: ApiTypeKeys) => `${getApiUrl(apiType)}player`;

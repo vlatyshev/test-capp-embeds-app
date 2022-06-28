@@ -1,4 +1,5 @@
 import { GIT_HUB_URL } from 'constants/socials';
+
 import { GitHubIcon } from 'icons/github';
 
 import styles from './Socials.module.css';

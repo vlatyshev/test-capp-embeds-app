@@ -1,4 +1,4 @@
-import { API_FILES_LIST, API_URLS } from 'constants/urls';
+import { API_FILES_LIST } from 'constants/urls';
 
 import type { ApiTypeKeys } from 'constants/urls';
 
@@ -16,7 +16,7 @@ const getModels = async (apiType: ApiTypeKeys, owner: string, limit: number, off
 
     const res = await fetch(`${API_FILES_LIST(apiType)}?${params}`);
 
-    return await res.json();
+    return res.json();
 };
 
 export const getModelsFromApi = async (apiType: ApiTypeKeys, owner: string, limit: number) => {
@@ -25,11 +25,11 @@ export const getModelsFromApi = async (apiType: ApiTypeKeys, owner: string, limi
     const minRound = Math.floor(limit / maxCount);
 
     const countRequests = [...new Array(maxRound)]
-        .map((_, index) => index < minRound ? maxCount : limit % maxCount);
+        .map((_, index) => (index < minRound ? maxCount : limit % maxCount));
 
-    const reqs = countRequests.map(async (limit, index) => (
-        getModels(apiType, owner, limit, index === 0 ? 0 : index + API_LIMIT_GET_MODELS_COUNT))
-    );
+    const reqs = countRequests.map(async (lim, index) => (
+        getModels(apiType, owner, lim, index === 0 ? 0 : index + API_LIMIT_GET_MODELS_COUNT)
+    ));
 
     return Promise.all(reqs);
 };

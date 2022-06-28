@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-max-props-per-line */
 export const GitHubIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg fill="none" viewBox="0 0 17 16" xmlns="http://www.w3.org/2000/svg" {...props}>
         <g clipPath="url(githublogo)">

@@ -2,10 +2,15 @@ import Head from 'next/head';
 import { useCallback } from 'react';
 import { useRouter } from 'next/router';
 
+import { formValuesToObject } from 'utils/parseFormData';
+
 import { getModelsFromApi } from 'lib/get_models';
+
+import { Socials } from 'components/Socials';
 import { ApiTypeSelect } from 'components/ApiTypeSelect';
 import { Capp3DPlayer } from 'components/Capp3DPlayer';
-import { formValuesToObject } from 'utils/parseFormData';
+
+import { SearchIcon } from 'icons/search';
 
 import styles from '../styles/Home.module.css';
 
@@ -73,9 +78,7 @@ const Home: NextPage<HomePageProps> = ({ modelIDs, error }) => {
                         placeholder="limit"
                     />
                     <button type="submit" className={styles.searchButton}>
-                        <svg width="24px" height="24px" viewBox="0 0 24 24" fill="#fff" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M 9 2 C 5.1458514 2 2 5.1458514 2 9 C 2 12.854149 5.1458514 16 9 16 C 10.747998 16 12.345009 15.348024 13.574219 14.28125 L 14 14.707031 L 14 16 L 20 22 L 22 20 L 16 14 L 14.707031 14 L 14.28125 13.574219 C 15.348024 12.345009 16 10.747998 16 9 C 16 5.1458514 12.854149 2 9 2 z M 9 4 C 11.773268 4 14 6.2267316 14 9 C 14 11.773268 11.773268 14 9 14 C 6.2267316 14 4 11.773268 4 9 C 4 6.2267316 6.2267316 4 9 4 z" />
-                        </svg>
+                        <SearchIcon />
                     </button>
                 </form>
                 {error && <div className={styles.error}>{error}</div>}
@@ -89,6 +92,7 @@ const Home: NextPage<HomePageProps> = ({ modelIDs, error }) => {
                     ))}
                 </div>
             </main>
+            <Socials />
         </div>
     );
 };
@@ -106,10 +110,14 @@ export const getServerSideProps: GetServerSideProps<HomePageProps> = async (ctx)
     }
     try {
         const resps = await getModelsFromApi(apiType, owner as string, Number(limit));
-        const findErrors = resps.find((resp) => (resp.status !== undefined && resp.status !== 200) || resp.errors !== undefined);
+        const findErrors = resps.find((resp) => (
+            resp.status !== undefined && resp.status !== 200
+        ) || resp.errors !== undefined);
 
         if (findErrors) {
-            const error = findErrors.errors.find((error: any) => error.title).title;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const error = findErrors.errors.find((err: any) => err.title).title;
+
             return {
                 props: {
                     error,
@@ -119,13 +127,14 @@ export const getServerSideProps: GetServerSideProps<HomePageProps> = async (ctx)
             };
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const modelIDs = resps.map((resp) => resp.data.map((fileData: any) => fileData.id)).flat();
 
         return {
             props: {
                 owner,
                 modelIDs,
-            }
+            },
         };
     } catch (e) {
         return {
@@ -136,7 +145,6 @@ export const getServerSideProps: GetServerSideProps<HomePageProps> = async (ctx)
             },
         };
     }
-
 };
 
 export default Home;
