@@ -1,6 +1,7 @@
 import { forwardRef } from 'react';
 import Head from 'next/head';
 import Script from 'next/script';
+import clsx from 'clsx';
 
 import { API_PLAYER_AI_URL, API_PLAYER_SRC, getApiUrl } from 'constants/urls';
 
@@ -18,6 +19,7 @@ const defaultOptions = 'autorun=1&closebutton=1&logo=1&analytics=1&uipadx=0&uipa
 export const Capp3DPlayer = forwardRef<HTMLIFrameElement, Capp3DPlayerProps>(({
     modelID,
     options = defaultOptions,
+    className,
 }, ref) => {
     const apiTypeQuery = useApiTypeQuery();
 
@@ -38,7 +40,7 @@ export const Capp3DPlayer = forwardRef<HTMLIFrameElement, Capp3DPlayerProps>(({
                 title="capp-player"
                 allowFullScreen
                 src={API_PLAYER_SRC(apiTypeQuery, modelID, options)}
-                className={styles.capp3dplayer}
+                className={clsx(styles.capp3dplayer, className)}
             />
         </>
     );
