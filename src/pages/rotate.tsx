@@ -1,8 +1,10 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import { useRouter } from 'next/router';
 import Head from 'next/head';
 import clsx from 'clsx';
 
 import { getApiUrl } from 'constants/urls';
+import { throttle, ThrottleFunc } from 'utils/trottle';
 
 import { Capp3DPlayer } from 'components/Capp3DPlayer';
 
@@ -18,14 +20,19 @@ type RotatePageProps = {
 };
 
 type RotatePageQuery = {
+    trottle?: number;
     modelIDs?: string;
 };
 
 const iframeOpts = 'autorun=1&closebutton=0&logo=0&analytics=1&uipadx=0&uipady=0&enablestoreurl=0&storeurl=&hidehints=0&language=&autorotate=0&autorotatetime=10&autorotatedelay=2&autorotatedir=1&hidefullscreen=1&hideautorotateopt=1&hidesettingsbtn=1&enableimagezoom=1&zoomquality=1&hidezoomopt=0&arbutton=1';
 
 const Rotate: NextPage<RotatePageProps> = ({ modelIDs }) => {
+    const router = useRouter();
+    const { trottle = 100 } = router.query as RotatePageQuery;
+
     const apiTypeQuery = useApiTypeQuery();
     const iframes = useRef<(HTMLIFrameElement | null)[]>([]);
+    const trottleFunc = useRef<ThrottleFunc>();
 
     const handleSlide = useCallback((value: number) => {
         iframes.current.forEach((iframe) => {
@@ -39,8 +46,12 @@ const Rotate: NextPage<RotatePageProps> = ({ modelIDs }) => {
     const handleSliderChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.target;
 
-        handleSlide(parseInt(value));
+        trottleFunc.current?.(parseInt(value));
     }, []);
+
+    useEffect(() => {
+        trottleFunc.current = throttle(handleSlide, trottle);
+    }, [handleSlide, trottle]);
 
     const handleIframeRef = useCallback((index: number) => (ref: HTMLIFrameElement | null) => {
         iframes.current[index] = ref;
