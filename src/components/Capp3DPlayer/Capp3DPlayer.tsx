@@ -1,6 +1,7 @@
 import { forwardRef } from 'react';
 import Head from 'next/head';
 import Script from 'next/script';
+import { useRouter } from 'next/router';
 import clsx from 'clsx';
 
 import { API_PLAYER_AI_URL, API_PLAYER_SRC, getApiUrl } from 'constants/urls';
@@ -21,6 +22,7 @@ export const Capp3DPlayer = forwardRef<HTMLIFrameElement, Capp3DPlayerProps>(({
     options = defaultOptions,
     className,
 }, ref) => {
+    const { query } = useRouter();
     const apiTypeQuery = useApiTypeQuery();
 
     return (
@@ -28,12 +30,14 @@ export const Capp3DPlayer = forwardRef<HTMLIFrameElement, Capp3DPlayerProps>(({
             <Head>
                 <link key="apicapp_preconnect" rel="preconnect" href={getApiUrl(apiTypeQuery)} />
             </Head>
-            <Script
-                async
-                id={`cappasity-ai-${apiTypeQuery}`}
-                key={`cappasity-ai-${apiTypeQuery}`}
-                src={API_PLAYER_AI_URL(apiTypeQuery)}
-            />
+            {!query.noAI && (
+                <Script
+                    async
+                    id={`cappasity-ai-${apiTypeQuery}`}
+                    key={`cappasity-ai-${apiTypeQuery}`}
+                    src={API_PLAYER_AI_URL(apiTypeQuery)}
+                />
+            )}
             <iframe
                 ref={ref}
                 loading="lazy"
