@@ -28,6 +28,9 @@ type HomePageQuery = {
     apiType?: ApiTypeKeys;
 };
 
+/**
+ * @TODO change to reusable component
+ */
 const Home: NextPage<HomePageProps> = ({ modelIDs, error }) => {
     const router = useRouter();
     const { owner = '', limit = 50 } = router.query as HomePageQuery;
@@ -97,6 +100,9 @@ const Home: NextPage<HomePageProps> = ({ modelIDs, error }) => {
     );
 };
 
+/**
+ * @TODO change to reusable component
+ */
 export const getServerSideProps: GetServerSideProps<HomePageProps> = async (ctx) => {
     const { owner, limit = 50, apiType = 'production' } = ctx.query as HomePageQuery;
 
