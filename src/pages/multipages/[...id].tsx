@@ -32,19 +32,19 @@ type HomePageQuery = {
  * @TODO change to reusable component
  */
 const Home: NextPage<HomePageProps> = ({ modelIDs, error }) => {
-    const router = useRouter();
-    const { owner = '', limit = 50 } = router.query as HomePageQuery;
+    const { push, query, asPath } = useRouter();
+    const { owner = '', limit = 50 } = query as HomePageQuery;
 
     const handleSubmitSearch = useCallback((e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const formValues = formValuesToObject(e.target as HTMLFormElement);
 
-        router.push({
-            pathname: '/',
+        push({
+            pathname: asPath,
             query: formValues,
         });
-    }, [router]);
+    }, [asPath, push]);
 
     return (
         <div className={styles.container}>
