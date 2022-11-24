@@ -10,6 +10,8 @@ import { Socials } from 'components/Socials';
 import { ApiTypeSelect } from 'components/ApiTypeSelect';
 import { Capp3DPlayer } from 'components/Capp3DPlayer';
 
+import { useQuery } from 'hooks/useQuery';
+
 import { SearchIcon } from 'icons/search';
 
 import styles from '../styles/Home.module.css';
@@ -24,13 +26,16 @@ type HomePageProps = {
 
 type HomePageQuery = {
     owner?: string;
-    limit?: string;
+    limit?: number;
     apiType?: ApiTypeKeys;
 };
 
 const Home: NextPage<HomePageProps> = ({ modelIDs, error }) => {
     const { push, query } = useRouter();
-    const { owner = '', limit = 50 } = query as HomePageQuery;
+    const { owner, limit } = useQuery<HomePageQuery>({
+        owner: '',
+        limit: 50,
+    });
 
     const handleSubmitSearch = useCallback((e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();

@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { useRouter } from 'next/router';
 import Head from 'next/head';
 import clsx from 'clsx';
 
@@ -8,7 +7,7 @@ import { throttle, ThrottleFunc } from 'utils/trottle';
 
 import { Capp3DPlayer } from 'components/Capp3DPlayer';
 
-import { useApiTypeQuery } from 'hooks/useApiTypeQuery';
+import { useQuery } from 'hooks/useQuery';
 
 import stylesHome from '../styles/Home.module.css';
 import styles from '../styles/Rotate.module.css';
@@ -20,17 +19,18 @@ type RotatePageProps = {
 };
 
 type RotatePageQuery = {
-    trottle?: number;
+    trottle: number;
     modelIDs?: string;
 };
 
 const iframeOpts = 'autorun=1&closebutton=0&logo=0&analytics=1&uipadx=0&uipady=0&enablestoreurl=0&storeurl=&hidehints=0&language=&autorotate=0&autorotatetime=10&autorotatedelay=2&autorotatedir=1&hidefullscreen=1&hideautorotateopt=1&hidesettingsbtn=1&enableimagezoom=1&zoomquality=1&hidezoomopt=0&arbutton=1';
 
 const Rotate: NextPage<RotatePageProps> = ({ modelIDs }) => {
-    const router = useRouter();
-    const { trottle = 100 } = router.query as RotatePageQuery;
+    const { trottle } = useQuery<RotatePageQuery>({
+        trottle: 100,
+    });
 
-    const apiTypeQuery = useApiTypeQuery();
+    const { apiType } = useQuery();
     const iframes = useRef<(HTMLIFrameElement | null)[]>([]);
     const trottleFunc = useRef<ThrottleFunc>();
 
@@ -39,7 +39,7 @@ const Rotate: NextPage<RotatePageProps> = ({ modelIDs }) => {
             if (!iframe || !iframe.contentWindow) {
                 return;
             }
-            iframe.contentWindow.postMessage({ fn: 'rotateToDeg', args: [value] }, getApiUrl(apiTypeQuery));
+            iframe.contentWindow.postMessage({ fn: 'rotateToDeg', args: [value] }, getApiUrl(apiType));
         });
     }, []);
 
@@ -93,7 +93,7 @@ const Rotate: NextPage<RotatePageProps> = ({ modelIDs }) => {
 };
 
 export const getServerSideProps: GetServerSideProps<RotatePageProps> = async (ctx) => {
-    const { modelIDs } = ctx.query as RotatePageQuery;
+    const { modelIDs } = ctx.query as Partial<RotatePageQuery>;
 
     if (!modelIDs) {
         return {

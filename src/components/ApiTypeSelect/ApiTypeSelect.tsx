@@ -1,6 +1,6 @@
 import { APIUrls } from 'constants/urls';
 
-import { useApiTypeQuery } from 'hooks/useApiTypeQuery';
+import { useQuery } from 'hooks/useQuery';
 
 import styles from './ApiTypeSelect.module.css';
 
@@ -11,13 +11,13 @@ interface ApiTypeSelectProps extends React.SelectHTMLAttributes<HTMLSelectElemen
 const apiTypeKeys = Object.entries(APIUrls).map(([key]) => key) as ApiTypeKeys[];
 
 export const ApiTypeSelect = (selectProps: ApiTypeSelectProps) => {
-    const apiTypeQuery = useApiTypeQuery();
+    const { apiType } = useQuery();
 
     return (
         <div className={styles.selectContainer}>
             API:
             <select
-                defaultValue={apiTypeQuery}
+                defaultValue={apiType}
                 className={styles.select}
                 {...selectProps}
             >
