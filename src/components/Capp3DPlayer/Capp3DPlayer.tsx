@@ -43,6 +43,7 @@ export const Capp3DPlayer = forwardRef<HTMLIFrameElement, Capp3DPlayerProps>(({
                 loading="lazy"
                 title="capp-player"
                 allowFullScreen
+                referrerPolicy="no-referrer"
                 src={API_PLAYER_SRC(apiTypeQuery, modelID, options)}
                 className={clsx(styles.capp3dplayer, className)}
             />
