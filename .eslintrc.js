@@ -86,7 +86,7 @@ module.exports = {
                     },
                 ],
                 pathGroupsExcludedImportTypes: ['builtin', 'type'],
-                'newlines-between': 'always-and-inside-groups',
+                'newlines-between': 'always',
             },
         ],
         'import/no-extraneous-dependencies': [

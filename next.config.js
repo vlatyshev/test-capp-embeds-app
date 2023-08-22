@@ -1,4 +1,13 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
-  reactStrictMode: true,
-}
+    reactStrictMode: true,
+    async redirects() {
+        return [
+            {
+                source: '/',
+                destination: '/multipages/1',
+                permanent: true,
+            },
+        ];
+    },
+};

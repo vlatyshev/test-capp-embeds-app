@@ -1,12 +1,10 @@
 import { useCallback, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import clsx from 'clsx';
-
 import { getApiUrl } from 'constants/urls';
 import { throttle, ThrottleFunc } from 'utils/trottle';
 
 import { Capp3DPlayer } from 'components/Capp3DPlayer';
-
 import { useQuery } from 'hooks/useQuery';
 
 import stylesHome from '../styles/Home.module.css';

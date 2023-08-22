@@ -1,23 +1,21 @@
 import Head from 'next/head';
 import { useCallback } from 'react';
 import { useRouter } from 'next/router';
-
 import { formValuesToObject } from 'utils/parseFormData';
 
 import { getModelsFromApi } from 'lib/get_models';
 
 import { Socials } from 'components/Socials';
 import { ApiTypeSelect } from 'components/ApiTypeSelect';
-import { Capp3DPlayer } from 'components/Capp3DPlayer';
-
+import { Capp3DPlayer, DEFAULT_CAPP3D_PLAYER_OPTIONS } from 'components/Capp3DPlayer';
 import { useQuery } from 'hooks/useQuery';
 
 import { SearchIcon } from 'icons/search';
 
 import styles from '../../styles/Home.module.css';
 
-import type { GetServerSideProps, NextPage } from 'next';
 import type { ApiTypeKeys } from 'constants/urls';
+import type { GetServerSideProps, NextPage } from 'next';
 
 type HomePageProps = {
     modelIDs: string[];
@@ -28,16 +26,15 @@ type HomePageQuery = {
     owner?: string;
     limit?: number;
     apiType?: ApiTypeKeys;
+    playerOptions?: string;
 };
 
-/**
- * @TODO change to reusable component
- */
 const Home: NextPage<HomePageProps> = ({ modelIDs, error }) => {
     const { push, query } = useRouter();
-    const { owner, limit } = useQuery<HomePageQuery>({
+    const { owner, limit, playerOptions } = useQuery<HomePageQuery>({
         owner: '',
-        limit: 50,
+        limit: 10,
+        playerOptions: DEFAULT_CAPP3D_PLAYER_OPTIONS,
     });
 
     const handleSubmitSearch = useCallback((e: React.FormEvent<HTMLFormElement>) => {
@@ -70,23 +67,36 @@ const Home: NextPage<HomePageProps> = ({ modelIDs, error }) => {
                     className={styles.search}
                     onSubmit={handleSubmitSearch}
                 >
-                    <input
-                        name="owner"
-                        type="text"
-                        className={styles.searchTerm}
-                        defaultValue={owner}
-                        placeholder="Search files of username"
-                    />
-                    <input
-                        name="limit"
-                        type="number"
-                        className={`${styles.searchTerm} ${styles.number}`}
-                        defaultValue={limit}
-                        placeholder="limit"
-                    />
-                    <button type="submit" className={styles.searchButton}>
-                        <SearchIcon />
-                    </button>
+                    <div className={styles.searchContainer}>
+                        <input
+                            name="owner"
+                            type="text"
+                            className={styles.searchTerm}
+                            defaultValue={owner}
+                            placeholder="Search files of username"
+                        />
+                        <input
+                            name="limit"
+                            type="number"
+                            className={`${styles.searchTerm} ${styles.number}`}
+                            defaultValue={limit}
+                            placeholder="limit"
+                        />
+                    </div>
+                    <div className={styles.searchContainer}>
+                        <input
+                            name="playerOptions"
+                            type="text"
+                            className={styles.searchTerm}
+                            defaultValue={playerOptions}
+                            placeholder="Player options"
+                        />
+                    </div>
+                    <div className={styles.searchContainer}>
+                        <button type="submit" className={styles.searchButton}>
+                            <SearchIcon />
+                        </button>
+                    </div>
                 </form>
                 {error && <div className={styles.error}>{error}</div>}
                 {modelIDs.length > 0 && <div>Loaded: {modelIDs.length}</div>}
@@ -94,7 +104,7 @@ const Home: NextPage<HomePageProps> = ({ modelIDs, error }) => {
                 <div className={styles.grid}>
                     {modelIDs.map((modelID) => (
                         <div key={modelID} className={styles.card}>
-                            <Capp3DPlayer modelID={modelID} />
+                            <Capp3DPlayer modelID={modelID} options={playerOptions} />
                         </div>
                     ))}
                 </div>
