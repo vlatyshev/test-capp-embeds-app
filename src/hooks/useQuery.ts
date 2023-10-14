@@ -1,26 +1,62 @@
 import { useRouter } from 'next/router';
+import { useCallback, useMemo } from 'react';
 
 import type { ApiTypeKeys } from 'constants/urls';
 
-type UseQuery<Query> = Query & {
+export type QueryParams<Query extends Record<string, unknown>> = Query & {
     apiType: ApiTypeKeys;
-    noAI: any | undefined; // eslint-disable-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    noAI: any | undefined;
     cappNoRefferer: React.HTMLAttributeReferrerPolicy;
 };
 
-const defaultQuery: UseQuery<{}> = {
+const defaultQuery: QueryParams<{}> = {
     apiType: 'production',
     noAI: undefined,
     cappNoRefferer: '',
 };
 
-export const useQuery = <T extends Record<string, unknown>>(
-    additionalDefault: T = {} as T,
-): UseQuery<T> => {
-    const { query } = useRouter();
+type ChangeQueryOptions = {
+    replace?: boolean;
+    shallow?: boolean;
+    scroll?: boolean;
+};
 
-    return {
-        ...{ ...defaultQuery, ...additionalDefault },
+type ChangeQuery<Query> = (newQuery: Partial<Query>, options?: ChangeQueryOptions) => Promise<void>;
+
+type QueryResult<Query> = [Query, ChangeQuery<Query>];
+
+export const useQuery = <T extends Record<string, unknown> = {}>(
+    additionalQueryDefault: T = {} as T,
+): QueryResult<QueryParams<Required<T>>> => {
+    const { query, push, replace } = useRouter();
+
+    const queryData = useMemo(() => ({
+        ...defaultQuery,
+        ...additionalQueryDefault as Required<T>,
         ...query,
-    };
+    }), [query]);
+
+    const handleChangeQuery: ChangeQuery<QueryParams<Required<T>>> = useCallback(async (newQuery, options = {}) => {
+        const { replace: isReplace, shallow, scroll } = options;
+
+        const newQueryData = {
+            ...queryData,
+            ...newQuery,
+        };
+
+        const routeOptions = {
+            shallow,
+            scroll,
+        };
+
+        if (isReplace) {
+            await replace({ query: newQueryData }, undefined, routeOptions);
+
+            return;
+        }
+        await push({ query: newQueryData }, undefined, routeOptions);
+    }, [queryData]);
+
+    return [queryData, handleChangeQuery];
 };

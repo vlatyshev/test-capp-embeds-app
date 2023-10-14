@@ -1,51 +1,72 @@
 import Head from 'next/head';
-import { useCallback } from 'react';
-import { useRouter } from 'next/router';
+import { useCallback, useState } from 'react';
+import clsx from 'clsx';
+import { FaSearch } from 'react-icons/fa';
 import { formValuesToObject } from 'utils/parseFormData';
 
-import { getModelsFromApi } from 'lib/get_models';
+import {
+    API_LIMIT_GET_MODELS_COUNT, getModelsFromApi, ListResponseDTO, ListResponseErrorDTO,
+} from 'lib/get_models';
 
 import { Socials } from 'components/Socials';
 import { ApiTypeSelect } from 'components/ApiTypeSelect';
 import { Capp3DPlayer, DEFAULT_CAPP3D_PLAYER_OPTIONS } from 'components/Capp3DPlayer';
-import { useQuery } from 'hooks/useQuery';
+import { QueryParams, useQuery } from 'hooks/useQuery';
+import { Button } from 'components/controls/Button';
+import { Pagination } from 'components/Pagination';
 
-import { SearchIcon } from 'icons/search';
+import styles from '../../styles/Multipages.module.css';
 
-import styles from '../../styles/Home.module.css';
-
-import type { ApiTypeKeys } from 'constants/urls';
 import type { GetServerSideProps, NextPage } from 'next';
 
-type HomePageProps = {
-    modelIDs: string[];
-    error?: null | string;
+type MultipagesPageProps = {
+    data: {
+        modelIDs: string[];
+        page: number;
+        pages: number;
+    };
+    error?: never;
+} | {
+    data?: never;
+    error: string;
 };
 
-type HomePageQuery = {
+type MutlipagesPageQuery = {
     owner?: string;
     limit?: number;
-    apiType?: ApiTypeKeys;
+    offset?: number;
     playerOptions?: string;
 };
 
-const Home: NextPage<HomePageProps> = ({ modelIDs, error }) => {
-    const { push, query } = useRouter();
-    const { owner, limit, playerOptions } = useQuery<HomePageQuery>({
+const Multipages: NextPage<MultipagesPageProps> = ({ error, data }) => {
+    const [query, setQuery] = useQuery<MutlipagesPageQuery>({
         owner: '',
         limit: 10,
+        offset: 0,
         playerOptions: DEFAULT_CAPP3D_PLAYER_OPTIONS,
     });
+    const { owner, limit, playerOptions } = query;
 
-    const handleSubmitSearch = useCallback((e: React.FormEvent<HTMLFormElement>) => {
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    const handleSubmitSearch = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const formValues = formValuesToObject(e.target as HTMLFormElement);
 
-        push({
-            query: { ...query, ...formValues },
-        });
-    }, [query]);
+        setIsLoading(true);
+        await setQuery({
+            ...formValues,
+            offset: 0,
+        }, { scroll: false });
+        setIsLoading(false);
+    }, [setQuery]);
+
+    const handleChangePage = useCallback(async (offset: number) => {
+        setIsLoading(true);
+        await setQuery({ offset }, { scroll: false });
+        setIsLoading(false);
+    }, [setQuery]);
 
     return (
         <div className={styles.container}>
@@ -78,7 +99,8 @@ const Home: NextPage<HomePageProps> = ({ modelIDs, error }) => {
                         <input
                             name="limit"
                             type="number"
-                            className={`${styles.searchTerm} ${styles.number}`}
+                            className={clsx(styles.searchTerm, styles.number)}
+                            max={API_LIMIT_GET_MODELS_COUNT}
                             defaultValue={limit}
                             placeholder="limit"
                         />
@@ -93,21 +115,43 @@ const Home: NextPage<HomePageProps> = ({ modelIDs, error }) => {
                         />
                     </div>
                     <div className={styles.searchContainer}>
-                        <button type="submit" className={styles.searchButton}>
-                            <SearchIcon />
-                        </button>
+                        <Button
+                            type="submit"
+                            disabled={isLoading}
+                            className={styles.searchButton}
+                        >
+                            <FaSearch />
+                        </Button>
                     </div>
                 </form>
-                {error && <div className={styles.error}>{error}</div>}
-                {modelIDs.length > 0 && <div>Loaded: {modelIDs.length}</div>}
-
-                <div className={styles.grid}>
-                    {modelIDs.map((modelID) => (
-                        <div key={modelID} className={styles.card}>
-                            <Capp3DPlayer modelID={modelID} options={playerOptions} />
+                {error && <span className={styles.error}>{error}</span>}
+                {data && data.modelIDs.length > 0 && (
+                    <>
+                        <Pagination
+                            loading={isLoading}
+                            currentCount={data.modelIDs.length}
+                            limit={limit}
+                            page={data.page}
+                            pages={data.pages}
+                            onPageChange={handleChangePage}
+                        />
+                        <div className={styles.grid}>
+                            {data.modelIDs.map((modelID) => (
+                                <div key={modelID} className={styles.card}>
+                                    <Capp3DPlayer modelID={modelID} options={playerOptions} />
+                                </div>
+                            ))}
                         </div>
-                    ))}
-                </div>
+                        <Pagination
+                            loading={isLoading}
+                            currentCount={data.modelIDs.length}
+                            limit={limit}
+                            page={data.page}
+                            pages={data.pages}
+                            onPageChange={handleChangePage}
+                        />
+                    </>
+                )}
             </main>
             <Socials />
         </div>
@@ -117,54 +161,64 @@ const Home: NextPage<HomePageProps> = ({ modelIDs, error }) => {
 /**
  * @TODO change to reusable component
  */
-export const getServerSideProps: GetServerSideProps<HomePageProps> = async (ctx) => {
-    const { owner, limit = 50, apiType = 'production' } = ctx.query as HomePageQuery;
+export const getServerSideProps: GetServerSideProps<MultipagesPageProps> = async (ctx) => {
+    const {
+        owner,
+        limit = 10,
+        apiType = 'production',
+        offset,
+    } = ctx.query as unknown as QueryParams<MutlipagesPageQuery>;
 
-    if (!owner) {
+    if (owner === undefined) {
         return {
             props: {
-                owner: null,
-                modelIDs: [],
+                data: {
+                    modelIDs: [],
+                    page: 1,
+                    pages: 1,
+                },
             },
         };
     }
     try {
-        const resps = await getModelsFromApi(apiType, owner as string, Number(limit));
-        const findErrors = resps.find((resp) => (
-            resp.status !== undefined && resp.status !== 200
-        ) || resp.errors !== undefined);
+        const responseData = await getModelsFromApi(
+            apiType,
+            owner as string,
+            Number(limit),
+            Number(offset),
+        );
 
-        if (findErrors) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const error = findErrors.errors.find((err: any) => err.title).title;
+        if ((responseData as ListResponseErrorDTO).errors) {
+            const error = (responseData as ListResponseErrorDTO).errors
+                .find((err) => err.title)!.title;
 
             return {
                 props: {
                     error,
-                    owner,
-                    modelIDs: [],
                 },
             };
         }
+        const { meta, data } = responseData as ListResponseDTO;
+        const { page, pages } = meta;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const modelIDs = resps.map((resp) => resp.data.map((fileData: any) => fileData.id)).flat();
+        const modelIDs = data.map((model) => model.id);
 
         return {
             props: {
-                owner,
-                modelIDs,
+                data: {
+                    page,
+                    pages,
+                    modelIDs,
+                },
             },
         };
     } catch (e) {
         return {
             props: {
                 error: (e as Error).toString(),
-                owner,
-                modelIDs: [],
             },
         };
     }
 };
 
-export default Home;
+export default Multipages;

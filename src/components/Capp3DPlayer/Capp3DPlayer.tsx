@@ -20,9 +20,10 @@ export const Capp3DPlayer = forwardRef<HTMLIFrameElement, Capp3DPlayerProps>(({
     options = DEFAULT_CAPP3D_PLAYER_OPTIONS,
     className,
 }, ref) => {
-    const { apiType, noAI, cappNoRefferer } = useQuery();
+    const [query] = useQuery();
+    const { apiType, noAI, cappNoRefferer } = query;
 
-    const query = useMemo<Record<string, string | number>>(() => {
+    const playerOptions = useMemo<Record<string, string | number>>(() => {
         try {
             return Object.fromEntries(new URLSearchParams(options).entries());
         } catch (error) {
@@ -53,8 +54,8 @@ export const Capp3DPlayer = forwardRef<HTMLIFrameElement, Capp3DPlayerProps>(({
                 allowFullScreen
                 referrerPolicy={cappNoRefferer}
                 src={API_PLAYER_SRC(apiType, modelID, options)}
-                width={query.width ?? '100%'}
-                height={query.height ?? '350'}
+                width={playerOptions.width ?? '100%'}
+                height={playerOptions.height ?? '350'}
                 className={clsx(styles.capp3dplayer, className)}
             />
         </>

@@ -7,7 +7,7 @@ import { throttle, ThrottleFunc } from 'utils/trottle';
 import { Capp3DPlayer } from 'components/Capp3DPlayer';
 import { useQuery } from 'hooks/useQuery';
 
-import stylesHome from '../styles/Home.module.css';
+import stylesHome from '../styles/Multipages.module.css';
 import styles from '../styles/Rotate.module.css';
 
 import type { GetServerSideProps, NextPage } from 'next';
@@ -24,11 +24,11 @@ type RotatePageQuery = {
 const iframeOpts = 'autorun=1&closebutton=0&logo=0&analytics=1&uipadx=0&uipady=0&enablestoreurl=0&storeurl=&hidehints=0&language=&autorotate=0&autorotatetime=10&autorotatedelay=2&autorotatedir=1&hidefullscreen=1&hideautorotateopt=1&hidesettingsbtn=1&enableimagezoom=1&zoomquality=1&hidezoomopt=0&arbutton=1';
 
 const Rotate: NextPage<RotatePageProps> = ({ modelIDs }) => {
-    const { trottle } = useQuery<RotatePageQuery>({
+    const [query] = useQuery<RotatePageQuery>({
         trottle: 100,
     });
+    const { trottle, apiType } = query;
 
-    const { apiType } = useQuery();
     const iframes = useRef<(HTMLIFrameElement | null)[]>([]);
     const trottleFunc = useRef<ThrottleFunc>();
 

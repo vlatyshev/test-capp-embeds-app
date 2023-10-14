@@ -11,7 +11,8 @@ interface ApiTypeSelectProps extends React.SelectHTMLAttributes<HTMLSelectElemen
 const apiTypeKeys = Object.entries(APIUrls).map(([key]) => key) as ApiTypeKeys[];
 
 export const ApiTypeSelect = (selectProps: ApiTypeSelectProps) => {
-    const { apiType } = useQuery();
+    const [query] = useQuery();
+    const { apiType } = query;
 
     return (
         <div className={styles.selectContainer}>

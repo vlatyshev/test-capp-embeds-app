@@ -82,18 +82,7 @@
 }
 
 .searchButton {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     width: 100px;
-    height: 36px;
-    border: 1px solid #0aadff;
-    background: #0aadff;
-    text-align: center;
-    color: #fff;
-    border-radius: 5px 5px;
-    cursor: pointer;
-    font-size: 20px;
 }
 
 .error {
@@ -107,7 +96,7 @@
     flex-wrap: wrap;
     max-width: 1350px;
     width: 100%;
-    margin-top: 3rem;
+    margin-top: 1rem;
 }
 
 @media (max-width: 600px) {
