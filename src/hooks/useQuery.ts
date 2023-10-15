@@ -1,19 +1,19 @@
-import { useRouter } from 'next/router';
 import { useCallback, useMemo } from 'react';
+import { useRouter } from 'next/router';
+import { omitBy, isNil } from 'lodash';
 
 import type { ApiTypeKeys } from 'constants/urls';
 
 export type QueryParams<Query extends Record<string, unknown>> = Query & {
     apiType: ApiTypeKeys;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    noAI: any | undefined;
-    cappNoRefferer: React.HTMLAttributeReferrerPolicy;
+    noAI?: unknown;
+    cappNoRefferer?: React.HTMLAttributeReferrerPolicy;
 };
 
 const defaultQuery: QueryParams<{}> = {
     apiType: 'production',
     noAI: undefined,
-    cappNoRefferer: '',
+    cappNoRefferer: undefined,
 };
 
 type ChangeQueryOptions = {
@@ -40,10 +40,10 @@ export const useQuery = <T extends Record<string, unknown> = {}>(
     const handleChangeQuery: ChangeQuery<QueryParams<Required<T>>> = useCallback(async (newQuery, options = {}) => {
         const { replace: isReplace, shallow, scroll } = options;
 
-        const newQueryData = {
+        const newQueryData = omitBy({
             ...queryData,
             ...newQuery,
-        };
+        }, isNil);
 
         const routeOptions = {
             shallow,

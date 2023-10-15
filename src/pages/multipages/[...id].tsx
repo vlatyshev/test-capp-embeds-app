@@ -158,9 +158,6 @@ const Multipages: NextPage<MultipagesPageProps> = ({ error, data }) => {
     );
 };
 
-/**
- * @TODO change to reusable component
- */
 export const getServerSideProps: GetServerSideProps<MultipagesPageProps> = async (ctx) => {
     const {
         owner,
