@@ -81,13 +81,12 @@ const Multipages: NextPage<MultipagesPageProps> = ({ error, data }) => {
                     App for testing <a href="https://3d.cappasity.com">Cappasity</a> embeds
                 </h1>
 
-                <ApiTypeSelect name="apiType" id="apiType" form="model-list" />
-
                 <form
                     id="model-list"
                     className={styles.search}
                     onSubmit={handleSubmitSearch}
                 >
+                    <ApiTypeSelect name="apiType" id="apiType" form="model-list" />
                     <div className={styles.searchContainer}>
                         <input
                             name="owner"

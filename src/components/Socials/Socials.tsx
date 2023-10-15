@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { FaGithub } from 'react-icons/fa';
 import { GIT_HUB_URL } from 'constants/socials';
 
@@ -7,7 +8,7 @@ const SOCIALS = [
     { name: 'GitHub', href: GIT_HUB_URL, Icon: FaGithub },
 ];
 
-export const Socials = () => (
+export const Socials = memo(() => (
     <div className={styles.socialsContainer}>
         {SOCIALS.map(({ name, href, Icon }) => (
             <a
@@ -21,4 +22,4 @@ export const Socials = () => (
             </a>
         ))}
     </div>
-);
+));

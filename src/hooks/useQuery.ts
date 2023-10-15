@@ -29,13 +29,15 @@ type QueryResult<Query> = [Query, ChangeQuery<Query>];
 export const useQuery = <T extends Record<string, unknown> = {}>(
     additionalQueryDefault: T = {} as T,
 ): QueryResult<QueryParams<Required<T>>> => {
-    const { query, push, replace } = useRouter();
+    const {
+        query, push, replace, isReady,
+    } = useRouter();
 
     const queryData = useMemo(() => ({
         ...defaultQuery,
         ...additionalQueryDefault as Required<T>,
         ...query,
-    }), [query]);
+    }), [isReady, query]);
 
     const handleChangeQuery: ChangeQuery<QueryParams<Required<T>>> = useCallback(async (newQuery, options = {}) => {
         const { replace: isReplace, shallow, scroll } = options;

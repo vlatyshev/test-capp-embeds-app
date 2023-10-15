@@ -1,4 +1,4 @@
-import { forwardRef, useMemo } from 'react';
+import { forwardRef, memo, useMemo } from 'react';
 import Head from 'next/head';
 import Script from 'next/script';
 import clsx from 'clsx';
@@ -8,17 +8,23 @@ import { useQuery } from 'hooks/useQuery';
 
 import styles from './Capp3DPlayer.module.css';
 
-interface Capp3DPlayerProps extends React.ComponentPropsWithoutRef<'input'> {
+interface Capp3DPlayerProps extends React.DetailedHTMLProps<
+React.ButtonHTMLAttributes<HTMLIFrameElement>, HTMLIFrameElement
+> {
     modelID: string;
     options?: string;
 }
 
 export const DEFAULT_CAPP3D_PLAYER_OPTIONS = 'autorun=1&closebutton=1&logo=1&analytics=1&uipadx=0&uipady=0&enablestoreurl=0&storeurl=&hidehints=0&language=&autorotate=0&autorotatetime=10&autorotatedelay=2&autorotatedir=1&hidefullscreen=1&hideautorotateopt=1&hidesettingsbtn=0&enableimagezoom=1&zoomquality=1&hidezoomopt=0&arbutton=1&width=100%&height=350';
 
-export const Capp3DPlayer = forwardRef<HTMLIFrameElement, Capp3DPlayerProps>(({
+export const Capp3DPlayer = memo(forwardRef<
+HTMLIFrameElement,
+Capp3DPlayerProps
+>(({
     modelID,
     options = DEFAULT_CAPP3D_PLAYER_OPTIONS,
     className,
+    ...props
 }, ref) => {
     const [query] = useQuery();
     const { apiType, noAI, cappNoRefferer } = query;
@@ -57,7 +63,8 @@ export const Capp3DPlayer = forwardRef<HTMLIFrameElement, Capp3DPlayerProps>(({
                 width={playerOptions.width ?? '100%'}
                 height={playerOptions.height ?? '350'}
                 className={clsx(styles.capp3dplayer, className)}
+                {...props}
             />
         </>
     );
-});
+}));

@@ -1,4 +1,5 @@
 import { APIUrls } from 'constants/urls';
+import { memo } from 'react';
 
 import { useQuery } from 'hooks/useQuery';
 
@@ -10,7 +11,7 @@ interface ApiTypeSelectProps extends React.SelectHTMLAttributes<HTMLSelectElemen
 
 const apiTypeKeys = Object.entries(APIUrls).map(([key]) => key) as ApiTypeKeys[];
 
-export const ApiTypeSelect = (selectProps: ApiTypeSelectProps) => {
+export const ApiTypeSelect = memo((selectProps: ApiTypeSelectProps) => {
     const [query] = useQuery();
     const { apiType } = query;
 
@@ -28,4 +29,4 @@ export const ApiTypeSelect = (selectProps: ApiTypeSelectProps) => {
             </select>
         </div>
     );
-};
+});

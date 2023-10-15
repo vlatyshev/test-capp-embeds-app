@@ -176,6 +176,7 @@ module.exports = {
             namedComponents: 'arrow-function',
         }],
         'react-hooks/exhaustive-deps': 'off',
+        'react/no-unused-prop-types': 'off',
 
         // jsx-a11y
         'jsx-a11y/anchor-is-valid': 'off',
