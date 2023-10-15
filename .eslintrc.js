@@ -95,16 +95,15 @@ module.exports = {
                 devDependencies: ['next.config.js', 'tailwind.config.js'],
             },
         ],
+        'import/no-duplicates': 'error',
 
         // using @typescript-eslint/...
-        'no-duplicate-imports': 'off',
         'no-unused-vars': 'off',
         indent: 'off',
         semi: 'off',
         // 'comma-dangle': 'off',
 
         // extends the base eslint/...
-        '@typescript-eslint/no-duplicate-imports': 'error',
         '@typescript-eslint/no-unused-vars': [
             'warn',
             {
@@ -120,14 +119,6 @@ module.exports = {
         '@typescript-eslint/no-explicit-any': 'error',
         '@typescript-eslint/member-ordering': ['warn', {
             default: [
-                'public-static-field',
-                'protected-static-field',
-                'private-static-field',
-
-                'public-static-method',
-                'protected-static-method',
-                'private-static-method',
-
                 'public-field',
                 'protected-field',
                 'private-field',
@@ -136,11 +127,9 @@ module.exports = {
 
                 'public-abstract-field',
                 'protected-abstract-field',
-                'private-abstract-field',
 
                 'public-abstract-method',
                 'protected-abstract-method',
-                'private-abstract-method',
 
                 'public-method',
                 'protected-method',
