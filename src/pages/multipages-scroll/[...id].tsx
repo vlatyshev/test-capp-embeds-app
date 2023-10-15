@@ -8,7 +8,7 @@ import clsx from 'clsx';
 import { useInView } from 'react-intersection-observer';
 
 import {
-    API_LIMIT_GET_MODELS_COUNT, ListResponseDTO, ListResponseErrorDTO, getModelsFromApi,
+    API_LIMIT_GET_MODELS_COUNT, ListResponseDTO, ListResponseErrorDTO,
 } from 'lib/get_models';
 
 import { Socials } from 'components/Socials';
@@ -37,15 +37,23 @@ const scrollFetcher = async ({
     offset,
     limit,
 }: { apiType: ApiTypeKeys, owner: string, offset: number, limit: number }) => {
-    const responseData = await getModelsFromApi(apiType, owner, limit, offset);
+    const params = new URLSearchParams({
+        apiType,
+        owner: String(owner),
+        offset: String(offset),
+        limit: String(limit),
+    });
 
-    if ((responseData as ListResponseErrorDTO).errors) {
-        const error = (responseData as ListResponseErrorDTO).errors
+    const responseData = await fetch(`/api/get-models?${params}`);
+    const jsonData = await responseData.json();
+
+    if ((jsonData as ListResponseErrorDTO).errors) {
+        const error = (jsonData as ListResponseErrorDTO).errors
             .find((err) => err.title)!.title;
 
         throw new Error(error);
     }
-    const { meta, data } = responseData as ListResponseDTO;
+    const { meta, data } = jsonData as ListResponseDTO;
     const { page, pages, cursor } = meta;
 
     const modelIDs = data.map((model) => model.id);
