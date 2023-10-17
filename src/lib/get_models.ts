@@ -59,3 +59,22 @@ export const getModelsFromApi = async (
 
     return data;
 };
+
+export const getParallelModelsFromApi = async (
+    apiType: ApiTypeKeys,
+    owner: string,
+    limit: number,
+): Promise<(ListResponseDTO | ListResponseErrorDTO)[]> => {
+    const maxCount = API_LIMIT_GET_MODELS_COUNT;
+    const maxRound = Math.ceil(limit / maxCount);
+    const minRound = Math.floor(limit / maxCount);
+
+    const countRequests = [...new Array(maxRound)]
+        .map((_, index) => (index < minRound ? maxCount : limit % maxCount));
+
+    const reqs = countRequests.map(async (lim, index) => (
+        getModelsFromApi(apiType, owner, lim, index === 0 ? 0 : index + API_LIMIT_GET_MODELS_COUNT)
+    ));
+
+    return Promise.all(reqs);
+};

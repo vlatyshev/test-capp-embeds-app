@@ -19,13 +19,16 @@ const Home: NextPage = () => (
             </h1>
             <ul>
                 <li>
-                    <Link href="/multipages/1" className={styles.url}>Multipages - pages with models of user</Link>
+                    <Link href="/multipages-pagination/1" className={styles.url}>Multipages Pagination - pages pagination with models of user</Link>
+                </li>
+                <li>
+                    <Link href="/multipages-parallel/1" className={styles.url}>Multipages Parallel - parallel requests to get models of user</Link>
                 </li>
                 <li>
                     <Link href="/multipages-scroll/1" className={styles.url}>Multipages Infinity Scroll - infinity scroll pages with models of user</Link>
                 </li>
                 <li>
-                    <Link href="rotate" className={styles.url}>Rotate - rotate models by scroll</Link>
+                    <Link href="rotate" className={styles.url}>Rotate - rotate models by slider</Link>
                 </li>
             </ul>
         </main>
