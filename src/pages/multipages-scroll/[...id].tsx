@@ -16,6 +16,7 @@ import { ApiTypeSelect } from 'components/ApiTypeSelect';
 import { Capp3DPlayer, DEFAULT_CAPP3D_PLAYER_OPTIONS } from 'components/Capp3DPlayer';
 import { useQuery } from 'hooks/useQuery';
 import { Button } from 'components/controls/Button';
+import { Select } from 'components/controls/Select';
 
 import styles from '../../styles/Multipages.module.css';
 
@@ -27,6 +28,7 @@ type MutlipagesPageQuery = {
     owner?: string;
     limit?: number;
     playerOptions?: string;
+    destroyNotInView?: number;
 };
 
 const MULTIPAGES_SCROLL_KEY = 'MULTIPAGES_MODELS_SCROLL';
@@ -66,6 +68,34 @@ const scrollFetcher = async ({
     };
 };
 
+const Capp3DPlayerWithDestroy = ({
+    modelID,
+    playerOptions,
+    destroyNotInView,
+}: {
+    modelID: string;
+    playerOptions: string;
+    destroyNotInView: number
+}) => {
+    const { ref: cardModelId, inView } = useInView({
+        rootMargin: '100%',
+        initialInView: true,
+    });
+
+    if (destroyNotInView === 1 && !inView) {
+        // eslint-disable-next-line no-console
+        console.info(modelID, 'Card destroyed');
+
+        return null;
+    }
+
+    return (
+        <div ref={cardModelId} key={modelID} className={styles.card}>
+            <Capp3DPlayer modelID={modelID} options={playerOptions} />
+        </div>
+    );
+};
+
 const MultipagesScroll: NextPage<MultipagesScrollPageProps> = () => {
     const [query, setQuery] = useQuery<MutlipagesPageQuery>({
         owner: '',
@@ -78,6 +108,7 @@ const MultipagesScroll: NextPage<MultipagesScrollPageProps> = () => {
         limit,
         playerOptions,
     } = query;
+    const destroyNotInView = Number(query.destroyNotInView ?? '0');
 
     const {
         data = [],
@@ -175,6 +206,23 @@ const MultipagesScroll: NextPage<MultipagesScrollPageProps> = () => {
                             placeholder="Player options"
                         />
                     </div>
+                    <Select
+                        name="destroyNotInView"
+                        id="destroyNotInView"
+                        form="model-list"
+                        label="Destroy not in View"
+                        defaultValue={destroyNotInView}
+                        options={[
+                            {
+                                label: 'No',
+                                value: '0',
+                            },
+                            {
+                                label: 'Yes',
+                                value: '1',
+                            },
+                        ]}
+                    />
                     <div className={styles.searchContainer}>
                         <Button
                             type="submit"
@@ -187,9 +235,11 @@ const MultipagesScroll: NextPage<MultipagesScrollPageProps> = () => {
                 </form>
                 <div className={styles.grid}>
                     {modelIDs.map((modelID) => (
-                        <div key={modelID} className={styles.card}>
-                            <Capp3DPlayer modelID={modelID} options={playerOptions} />
-                        </div>
+                        <Capp3DPlayerWithDestroy
+                            destroyNotInView={destroyNotInView}
+                            modelID={modelID}
+                            playerOptions={playerOptions}
+                        />
                     ))}
                 </div>
                 {error && <span className={styles.error}>{error.message}</span>}
