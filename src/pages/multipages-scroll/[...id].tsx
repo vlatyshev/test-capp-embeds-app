@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import { FaSearch } from 'react-icons/fa';
 import { formValuesToObject } from 'utils/parseFormData';
@@ -77,20 +77,28 @@ const Capp3DPlayerWithDestroy = ({
     playerOptions: string;
     destroyNotInView: number
 }) => {
+    const [wasInView, setWasInView] = useState(false);
     const { ref: cardModelId, inView } = useInView({
         rootMargin: '100%',
         initialInView: true,
     });
 
-    if (destroyNotInView === 1 && !inView) {
+    useEffect(() => {
+        if (wasInView === true || inView) {
+            return;
+        }
+        setWasInView(true);
+    }, [inView]);
+
+    if (destroyNotInView === 1 && wasInView) {
         // eslint-disable-next-line no-console
-        console.info(modelID, 'Card destroyed');
+        console.log(modelID, 'Card destroyed');
 
         return null;
     }
 
     return (
-        <div ref={cardModelId} key={modelID} className={styles.card}>
+        <div ref={cardModelId} className={styles.card}>
             <Capp3DPlayer modelID={modelID} options={playerOptions} />
         </div>
     );
@@ -236,6 +244,7 @@ const MultipagesScroll: NextPage<MultipagesScrollPageProps> = () => {
                 <div className={styles.grid}>
                     {modelIDs.map((modelID) => (
                         <Capp3DPlayerWithDestroy
+                            key={modelID}
                             destroyNotInView={destroyNotInView}
                             modelID={modelID}
                             playerOptions={playerOptions}
