@@ -3,7 +3,6 @@ import { useCallback, useEffect, useState } from 'react';
 import useSWRInfinite from 'swr/infinite';
 import { FaSearch } from 'react-icons/fa';
 import { formValuesToObject } from 'utils/parseFormData';
-import { ApiTypeKeys } from 'constants/urls';
 import clsx from 'clsx';
 import { useInView } from 'react-intersection-observer';
 
@@ -14,7 +13,7 @@ import {
 import { Socials } from 'components/Socials';
 import { ApiTypeSelect } from 'components/ApiTypeSelect';
 import { Capp3DPlayer, DEFAULT_CAPP3D_PLAYER_OPTIONS } from 'components/Capp3DPlayer';
-import { useQuery } from 'hooks/useQuery';
+import { QueryParams, useQuery } from 'hooks/useQuery';
 import { Button } from 'components/controls/Button';
 import { Select } from 'components/controls/Select';
 
@@ -38,13 +37,18 @@ const scrollFetcher = async ({
     owner,
     offset,
     limit,
-}: { apiType: ApiTypeKeys, owner: string, offset: number, limit: number }) => {
+}: QueryParams<{ owner?: string, offset: number, limit: number }>) => {
     const params = new URLSearchParams({
-        apiType,
-        owner: String(owner),
         offset: String(offset),
         limit: String(limit),
     });
+
+    if (apiType !== undefined) {
+        params.append('apiType', apiType);
+    }
+    if (owner !== undefined) {
+        params.append('owner', owner);
+    }
 
     const responseData = await fetch(`/api/get-models?${params}`);
     const jsonData = await responseData.json();
@@ -106,7 +110,6 @@ const Capp3DPlayerWithDestroy = ({
 
 const MultipagesScroll: NextPage<MultipagesScrollPageProps> = () => {
     const [query, setQuery] = useQuery<MutlipagesPageQuery>({
-        owner: '',
         limit: 10,
         playerOptions: DEFAULT_CAPP3D_PLAYER_OPTIONS,
     });
@@ -153,21 +156,21 @@ const MultipagesScroll: NextPage<MultipagesScrollPageProps> = () => {
         setSize((storeSize) => storeSize + 1);
     }, [setSize]);
 
+    const modelIDs = data.map((pageData) => pageData.modelIDs).flat();
+    const isLoadingMore = isLoading || (size > 0 && data && typeof data[size - 1] === 'undefined');
+    const isEmpty = data?.[0]?.modelIDs.length === 0;
+    const isReachingEnd = isEmpty || (data && data[data.length - 1]?.page >= data[data.length - 1]?.pages);
+
     const { ref: buttonRef, inView } = useInView({
         rootMargin: '100%',
     });
 
     useEffect(() => {
-        if (isLoading || !inView) {
+        if (isReachingEnd || isLoading || !inView) {
             return;
         }
         handleLoadNextPage();
-    }, [handleLoadNextPage, inView, isLoading, data.length]);
-
-    const modelIDs = data.map((pageData) => pageData.modelIDs).flat();
-    const isLoadingMore = isLoading || (size > 0 && data && typeof data[size - 1] === 'undefined');
-    const isEmpty = data?.[0]?.modelIDs.length === 0;
-    const isReachingEnd = isEmpty || (data && data[data.length - 1]?.page >= data[data.length - 1]?.pages);
+    }, [handleLoadNextPage, inView, isLoading, data.length, isReachingEnd]);
 
     return (
         <div className={styles.container}>

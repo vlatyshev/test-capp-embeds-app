@@ -5,13 +5,13 @@ import { omitBy, isNil } from 'lodash';
 import type { ApiTypeKeys } from 'constants/urls';
 
 export type QueryParams<Query extends Record<string, unknown>> = Query & {
-    apiType: ApiTypeKeys;
+    apiType?: ApiTypeKeys;
     noAI?: unknown;
     cappNoRefferer?: React.HTMLAttributeReferrerPolicy;
 };
 
 const defaultQuery: QueryParams<{}> = {
-    apiType: 'production',
+    apiType: 'staging',
     noAI: undefined,
     cappNoRefferer: undefined,
 };

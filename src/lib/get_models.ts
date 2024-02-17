@@ -13,15 +13,15 @@ type ListDataResponseDTO = {
 
 export type ListResponseDTO = {
     meta: {
-        id: string,
+        // id: string,
         page: number;
         pages: number;
         cursor: number;
     },
-    links: {
-        self: string;
-        next: string;
-    },
+    // links: {
+    //     self: string;
+    //     next: string;
+    // },
     data: ListDataResponseDTO[],
 };
 
@@ -38,11 +38,22 @@ export type ListResponseErrorDTO = {
 };
 
 export const getModelsFromApi = async (
-    apiType: ApiTypeKeys,
-    owner: string,
-    limit: number,
+    apiType?: ApiTypeKeys,
+    owner?: string,
+    limit: number = 10,
     offset: number = 0,
 ): Promise<ListResponseDTO | ListResponseErrorDTO> => {
+    if (apiType === undefined || owner === undefined || owner === '') {
+        return {
+            meta: {
+                page: 1,
+                pages: 1,
+                cursor: 1,
+            },
+            data: [],
+        };
+    }
+
     const limitCount = Math.min(Math.max(limit, 0), API_LIMIT_GET_MODELS_COUNT);
 
     const params = new URLSearchParams({
@@ -61,9 +72,9 @@ export const getModelsFromApi = async (
 };
 
 export const getParallelModelsFromApi = async (
-    apiType: ApiTypeKeys,
-    owner: string,
-    limit: number,
+    apiType?: ApiTypeKeys,
+    owner?: string,
+    limit: number = 10,
 ): Promise<(ListResponseDTO | ListResponseErrorDTO)[]> => {
     const maxCount = API_LIMIT_GET_MODELS_COUNT;
     const maxRound = Math.ceil(limit / maxCount);

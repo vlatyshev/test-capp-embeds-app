@@ -142,18 +142,9 @@ export const getServerSideProps: GetServerSideProps<MultipagesPageProps> = async
     const {
         owner,
         limit = 10,
-        apiType = 'production',
+        apiType,
     } = ctx.query as unknown as QueryParams<MutlipagesPageQuery>;
 
-    if (owner === undefined) {
-        return {
-            props: {
-                data: {
-                    modelIDs: [],
-                },
-            },
-        };
-    }
     try {
         const responseDatas = await getParallelModelsFromApi(
             apiType,

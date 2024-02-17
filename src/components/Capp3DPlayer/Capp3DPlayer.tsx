@@ -40,6 +40,10 @@ Capp3DPlayerProps
         }
     }, [options]);
 
+    if (apiType === undefined) {
+        return null;
+    }
+
     return (
         <>
             <Head>

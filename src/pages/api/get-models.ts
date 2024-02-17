@@ -19,7 +19,7 @@ const handleModelAPI = async (req: NextApiRequest, res: NextApiResponse<Response
     const {
         owner,
         limit = 10,
-        apiType = 'production',
+        apiType,
         offset,
     } = query as GetModelsQuery;
 

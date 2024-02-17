@@ -40,7 +40,6 @@ type MutlipagesPageQuery = {
 
 const Multipages: NextPage<MultipagesPageProps> = ({ error, data }) => {
     const [query, setQuery] = useQuery<MutlipagesPageQuery>({
-        owner: '',
         limit: 10,
         offset: 0,
         playerOptions: DEFAULT_CAPP3D_PLAYER_OPTIONS,
@@ -161,21 +160,10 @@ export const getServerSideProps: GetServerSideProps<MultipagesPageProps> = async
     const {
         owner,
         limit = 10,
-        apiType = 'production',
+        apiType,
         offset,
     } = ctx.query as unknown as QueryParams<MutlipagesPageQuery>;
 
-    if (owner === undefined) {
-        return {
-            props: {
-                data: {
-                    modelIDs: [],
-                    page: 1,
-                    pages: 1,
-                },
-            },
-        };
-    }
     try {
         const responseData = await getModelsFromApi(
             apiType,

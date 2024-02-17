@@ -27,7 +27,7 @@ const Rotate: NextPage<RotatePageProps> = ({ modelIDs }) => {
     const [query] = useQuery<RotatePageQuery>({
         trottle: 100,
     });
-    const { trottle, apiType } = query;
+    const { trottle, apiType = 'staging' } = query;
 
     const iframes = useRef<(HTMLIFrameElement | null)[]>([]);
     const trottleFunc = useRef<ThrottleFunc>();
