@@ -11,7 +11,7 @@ type PaginationProps = {
     limit: number;
     page: number;
     pages: number;
-    onPageChange: (offset: number) => void;
+    onPageChange: (offset: number, page: number) => void;
 };
 
 export const Pagination = memo(({
@@ -23,11 +23,11 @@ export const Pagination = memo(({
     onPageChange,
 }: PaginationProps) => {
     const handlePrevPage = useCallback(() => {
-        onPageChange((page - 2) * limit);
+        onPageChange((page - 2) * limit, page - 1);
     }, [onPageChange, limit, page]);
 
     const handleNextPage = useCallback(() => {
-        onPageChange(page * limit);
+        onPageChange(page * limit, page + 1);
     }, [onPageChange, limit, page]);
 
     return (

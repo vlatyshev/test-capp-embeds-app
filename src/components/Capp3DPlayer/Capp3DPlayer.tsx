@@ -1,4 +1,6 @@
-import { forwardRef, memo, useMemo } from 'react';
+import {
+    forwardRef, memo, useCallback, useEffect, useMemo, useState,
+} from 'react';
 import Head from 'next/head';
 import Script from 'next/script';
 import clsx from 'clsx';
@@ -40,6 +42,18 @@ Capp3DPlayerProps
         }
     }, [options]);
 
+    const [isScriptLoaded, setIsScriptLoaded] = useState<boolean>(false);
+
+    const handleOnReadyScript = useCallback(() => {
+        setIsScriptLoaded(true);
+    }, []);
+
+    useEffect(() => {
+        if (!noAI) {
+            setIsScriptLoaded(true);
+        }
+    }, [noAI]);
+
     if (apiType === undefined) {
         return null;
     }
@@ -55,20 +69,23 @@ Capp3DPlayerProps
                     id={`cappasity-ai-${apiType}`}
                     key={`cappasity-ai-${apiType}`}
                     src={API_PLAYER_AI_URL(apiType)}
+                    onReady={handleOnReadyScript}
                 />
             )}
-            <iframe
-                ref={ref}
-                loading="lazy"
-                title="capp-player"
-                allowFullScreen
-                referrerPolicy={cappNoRefferer}
-                src={API_PLAYER_SRC(apiType, modelID, options)}
-                width={playerOptions.width ?? '100%'}
-                height={playerOptions.height ?? '350'}
-                className={clsx(styles.capp3dplayer, className)}
-                {...props}
-            />
+            {isScriptLoaded && (
+                <iframe
+                    ref={ref}
+                    loading="lazy"
+                    title="capp-player"
+                    allowFullScreen
+                    referrerPolicy={cappNoRefferer}
+                    src={API_PLAYER_SRC(apiType, modelID, options)}
+                    width={playerOptions.width ?? '100%'}
+                    height={playerOptions.height ?? '350'}
+                    className={clsx(styles.capp3dplayer, className)}
+                    {...props}
+                />
+            )}
         </>
     );
 }));

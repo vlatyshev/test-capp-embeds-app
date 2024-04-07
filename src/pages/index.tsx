@@ -19,6 +19,9 @@ const Home: NextPage = () => (
             </h1>
             <ul>
                 <li>
+                    <Link href="/multipages-as-page/1" className={styles.url}>Multipages as Page - page per page pagination with models of user</Link>
+                </li>
+                <li>
                     <Link href="/multipages-pagination/1" className={styles.url}>Multipages Pagination - pages pagination with models of user</Link>
                 </li>
                 <li>
