@@ -49,7 +49,7 @@ Capp3DPlayerProps
     }, []);
 
     useEffect(() => {
-        if (!noAI) {
+        if (noAI) {
             setIsScriptLoaded(true);
         }
     }, [noAI]);
